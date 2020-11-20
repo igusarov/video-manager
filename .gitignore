@@ -30,3 +30,4 @@ yarn-error.log*
 *.launch
 .settings/
 *.sublime-workspace
+debug.log
