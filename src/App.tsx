@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { AppBar, Container, Toolbar, Typography } from '@material-ui/core';
 import { VideosTable } from './components/videos-table/videos-table';
-import { getVideos, removeVideoById } from './services/videos';
+import * as videosService from './services/videos';
 import { Video } from './services/video.interface';
 import { ConfirmationDialog } from './components/confirmation-dialog/confirmation-dialog';
 import { EditVideoModal } from './components/edit-video-modal/edit-video-modal';
+import { VideoDraft } from './components/video-form/video-form.interface';
 
 const App: React.FC = () => {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -12,9 +13,9 @@ const App: React.FC = () => {
   const [editVideoIsShown, setEditVideoIsShown] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
-  const fetchVideos = () => {
-    getVideos().then(handleVideosResponse);
-  };
+  const fetchVideos = useCallback(() => {
+    videosService.getVideos().then(handleVideosResponse);
+  }, []);
 
   const handleVideosResponse = (videos: Video[]) => {
     setVideos(videos);
@@ -30,23 +31,40 @@ const App: React.FC = () => {
     setSelectedVideo(video);
   };
 
-  const handleRemoveVideoAccept = async () => {
+  const handleRemoveVideoAccept = useCallback(async () => {
     try {
-      selectedVideo && await removeVideoById(selectedVideo.id);
+      selectedVideo && await videosService.removeVideoById(selectedVideo.id);
     } catch (e) {
       console.error(e);
     }
     setConfirmDialogIsShown(false);
-    setSelectedVideo(null);
     fetchVideos();
-  };
+  }, [selectedVideo, fetchVideos]);
 
-  const handleRemoveVideoDismiss = () => {
+  const handleRemoveVideoDismiss = useCallback(() => {
     setConfirmDialogIsShown(false);
-    setSelectedVideo(null);
-  };
+  }, []);
 
-  useEffect(fetchVideos, []);
+  const handleEditVideoDismiss = useCallback(() => {
+    setEditVideoIsShown(false);
+  }, []);
+
+  const handleEditVideoSubmit = useCallback(async (video: VideoDraft) => {
+    try {
+      selectedVideo && await videosService.saveVideoById(
+        selectedVideo.id,
+        {
+          ...video,
+          id: selectedVideo.id,
+        });
+    } catch (e) {
+      console.error(e);
+    }
+    setEditVideoIsShown(false);
+    await fetchVideos();
+  }, [fetchVideos, selectedVideo]);
+
+  useEffect(() => fetchVideos(), [fetchVideos]);
 
   return (
     <>
@@ -63,7 +81,7 @@ const App: React.FC = () => {
         />
       </Container>
       <ConfirmationDialog
-        isOpen={confirmDialogIsShown}
+        isShown={confirmDialogIsShown}
         title={'Video deletion'}
         description={'Do you want to delete the video?'}
         onAccept={handleRemoveVideoAccept}
@@ -72,7 +90,8 @@ const App: React.FC = () => {
       <EditVideoModal
         isShown={editVideoIsShown}
         video={selectedVideo}
-        onDismiss={() => {}}
+        onDismiss={handleEditVideoDismiss}
+        onSubmit={handleEditVideoSubmit}
       />
     </>
   );

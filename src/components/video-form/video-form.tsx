@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export const VideoForm: React.FC<VideoFormProps> = ({ video, onChange }) => {
+const Component: React.FC<VideoFormProps> = ({ video, onChange }) => {
   const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
   const [availableAuthors, setAvailableAuthors] = useState<Author[]>([]);
   const [author, setAuthor] = useState<string>('');
@@ -57,12 +57,14 @@ export const VideoForm: React.FC<VideoFormProps> = ({ video, onChange }) => {
     onChange({
       author,
       name,
-      categories: Object.keys(categories),
+      categories: Object
+        .entries(categories)
+        .reduce<string[]>((acc, [key, val]) => val ? [...acc, key] : acc, []),
     })
   }, [author, name, categories, onChange]);
 
-  const handleNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setName(event.target.value as string);
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
   };
 
   const handleAuthorChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -117,3 +119,5 @@ export const VideoForm: React.FC<VideoFormProps> = ({ video, onChange }) => {
     </form>
   );
 };
+
+export const VideoForm = React.memo(Component);

@@ -2,11 +2,12 @@ import React from 'react';
 import { ConfirmationDialogProps } from './confirmation-dialog.interface';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
 
-export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ onAccept, onDismiss, isOpen, title, description }) => {
+const Component: React.FC<ConfirmationDialogProps> = ({ onAccept, onDismiss, isShown, title, description }) => {
   return (
     <Dialog
       maxWidth="xs"
-      open={isOpen}
+      open={isShown}
+      onClose={onDismiss}
     >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{description}</DialogContent>
@@ -20,5 +21,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ onAccept
       </DialogActions>
     </Dialog>
   )
-}
+};
+
+export const ConfirmationDialog = React.memo(Component);
 

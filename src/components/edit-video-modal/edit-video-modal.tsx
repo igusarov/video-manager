@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { EditVideoModalProps } from './edit-video-modal.interface';
 import {
   Button,
@@ -10,10 +10,17 @@ import {
 import { VideoForm } from '../video-form/video-form';
 import { VideoDraft } from '../video-form/video-form.interface';
 
-export const EditVideoModal: React.FC<EditVideoModalProps> = ({ isShown, onDismiss, video }) => {
+const Component: React.FC<EditVideoModalProps> = ({ isShown, onDismiss, video, onSubmit }) => {
+  const [videoDraft, setVideoDraft] = useState<VideoDraft | null>(null);
 
-  const handleChange = (video: VideoDraft) => {
-    console.log('submit video', video)
+  const handleChange = useCallback((video: VideoDraft) => {
+    setVideoDraft(video);
+  }, []);
+
+  const handleSubmit = () => {
+    if (videoDraft) {
+      onSubmit(videoDraft);
+    }
   };
 
   return (
@@ -26,10 +33,12 @@ export const EditVideoModal: React.FC<EditVideoModalProps> = ({ isShown, onDismi
         <Button onClick={onDismiss} color="primary">
           Cancel
         </Button>
-        <Button onClick={onDismiss} color="primary">
+        <Button onClick={handleSubmit} color="primary">
           Save
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
+
+export const EditVideoModal = React.memo(Component);
