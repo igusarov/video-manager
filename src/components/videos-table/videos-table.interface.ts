@@ -1,4 +1,4 @@
-import { Video } from '../services/video.interface';
+import { Video } from '../../services/video.interface';
 
 export interface VideosTableProps {
   videos: Video[];
