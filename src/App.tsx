@@ -15,7 +15,7 @@ const App: React.FC = () => {
     console.log(video);
   };
 
-  const handleCLickDelete = (video: Video) => {
+  const handleClickDelete = (video: Video) => {
     console.log(video)
   };
 
@@ -32,7 +32,7 @@ const App: React.FC = () => {
       <Container>
         <VideosTable
           videos={videos}
-          onClickDelete={handleCLickDelete}
+          onClickDelete={handleClickDelete}
           onClickEdit={handleClickEdit}
         />
       </Container>
