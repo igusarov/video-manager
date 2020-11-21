@@ -4,11 +4,13 @@ import { VideosTable } from './components/videos-table/videos-table';
 import { getVideos, removeVideoById } from './services/videos';
 import { Video } from './services/video.interface';
 import { ConfirmationDialog } from './components/confirmation-dialog/confirmation-dialog';
+import { EditVideoModal } from './components/edit-video-modal/edit-video-modal';
 
 const App: React.FC = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [confirmDialogIsShown, setConfirmDialogIsShown] = useState(false);
-  const [videoToRemove, setVideoToRemove] = useState<Video | null>(null);
+  const [editVideoIsShown, setEditVideoIsShown] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
   const fetchVideos = () => {
     getVideos().then(handleVideosResponse);
@@ -19,29 +21,29 @@ const App: React.FC = () => {
   };
 
   const handleClickEdit = (video: Video) => {
-    console.log(video);
+    setEditVideoIsShown(true);
+    setSelectedVideo(video);
   };
 
   const handleClickDelete = (video: Video) => {
     setConfirmDialogIsShown(true);
-    setVideoToRemove(video);
+    setSelectedVideo(video);
   };
 
   const handleRemoveVideoAccept = async () => {
     try {
-      videoToRemove && await removeVideoById(videoToRemove.id);
+      selectedVideo && await removeVideoById(selectedVideo.id);
     } catch (e) {
       console.error(e);
     }
     setConfirmDialogIsShown(false);
-    setVideoToRemove(null);
+    setSelectedVideo(null);
     fetchVideos();
   };
 
   const handleRemoveVideoDismiss = () => {
-    console.log('cancel removing video', videoToRemove);
     setConfirmDialogIsShown(false);
-    setVideoToRemove(null);
+    setSelectedVideo(null);
   };
 
   useEffect(fetchVideos, []);
@@ -66,6 +68,11 @@ const App: React.FC = () => {
         description={'Do you want to delete the video?'}
         onAccept={handleRemoveVideoAccept}
         onDismiss={handleRemoveVideoDismiss}
+      />
+      <EditVideoModal
+        isShown={editVideoIsShown}
+        video={selectedVideo}
+        onDismiss={() => {}}
       />
     </>
   );
