@@ -11,6 +11,14 @@ const App: React.FC = () => {
     setVideos(videos);
   };
 
+  const handleClickEdit = (video: Video) => {
+    console.log(video);
+  };
+
+  const handleCLickDelete = (video: Video) => {
+    console.log(video)
+  };
+
   useEffect(() => {
     getVideos().then(handleVideosResponse);
   }, []);
@@ -22,7 +30,11 @@ const App: React.FC = () => {
         </Toolbar>
       </AppBar>
       <Container>
-        <VideosTable videos={videos} />
+        <VideosTable
+          videos={videos}
+          onClickDelete={handleCLickDelete}
+          onClickEdit={handleClickEdit}
+        />
       </Container>
     </>
   );

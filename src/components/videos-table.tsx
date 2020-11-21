@@ -1,8 +1,8 @@
 import React from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { VideosTableProps } from './videos-table.interface';
 
-export const VideosTable: React.FC<VideosTableProps> = ({ videos }) => {
+export const VideosTable: React.FC<VideosTableProps> = ({ videos, onClickEdit, onClickDelete }) => {
   return (
     <TableContainer component={Paper} style={{ marginTop: '40px' }}>
       <Table>
@@ -22,7 +22,22 @@ export const VideosTable: React.FC<VideosTableProps> = ({ videos }) => {
               </TableCell>
               <TableCell>{video.author}</TableCell>
               <TableCell>{video.categories.join(', ')}</TableCell>
-              <TableCell> {/* add buttons here as needed */}  </TableCell>
+              <TableCell>
+                <Button
+                  onClick={() => onClickEdit(video)}
+                  variant="contained"
+                  color="primary"
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => onClickDelete(video)}
+                  variant="contained"
+                  color="secondary"
+                >
+                  Delete
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
