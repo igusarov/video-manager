@@ -1,6 +1,6 @@
 import { Video } from './video.interface';
 import { getCategories } from './categories';
-import { getAuthors } from './authors';
+import { getAuthors, patchAuthorById } from './authors';
 
 export const getVideos = (): Promise<Video[]> => {
   return Promise.all([getCategories(), getAuthors()])
@@ -23,4 +23,14 @@ export const getVideos = (): Promise<Video[]> => {
       ];
     }, []);
   });
+};
+
+export const removeVideoById = async (id: number): Promise<void> => {
+  const authors = await getAuthors() || [];
+  const author = authors.find((item) => item.videos.some((item) => item.id === id));
+  if (!author) {
+    throw new Error('Author not found');
+  }
+  const updatedVideos = author.videos.filter((item) => item.id !== id);
+  await patchAuthorById(author.id, {videos: updatedVideos});
 };

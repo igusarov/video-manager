@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AppBar, Container, Toolbar, Typography } from '@material-ui/core';
 import { VideosTable } from './components/videos-table/videos-table';
-import { getVideos } from './services/videos';
+import { getVideos, removeVideoById } from './services/videos';
 import { Video } from './services/video.interface';
 import { ConfirmationDialog } from './components/confirmation-dialog/confirmation-dialog';
 
@@ -9,6 +9,10 @@ const App: React.FC = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [confirmDialogIsShown, setConfirmDialogIsShown] = useState(false);
   const [videoToRemove, setVideoToRemove] = useState<Video | null>(null);
+
+  const fetchVideos = () => {
+    getVideos().then(handleVideosResponse);
+  };
 
   const handleVideosResponse = (videos: Video[]) => {
     setVideos(videos);
@@ -23,10 +27,15 @@ const App: React.FC = () => {
     setVideoToRemove(video);
   };
 
-  const handleRemoveVideoAccept = () => {
-    console.log('remove video', videoToRemove);
+  const handleRemoveVideoAccept = async () => {
+    try {
+      videoToRemove && await removeVideoById(videoToRemove.id);
+    } catch (e) {
+      console.error(e);
+    }
     setConfirmDialogIsShown(false);
     setVideoToRemove(null);
+    fetchVideos();
   };
 
   const handleRemoveVideoDismiss = () => {
@@ -35,9 +44,8 @@ const App: React.FC = () => {
     setVideoToRemove(null);
   };
 
-  useEffect(() => {
-    getVideos().then(handleVideosResponse);
-  }, []);
+  useEffect(fetchVideos, []);
+
   return (
     <>
       <AppBar position="static">
