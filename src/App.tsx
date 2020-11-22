@@ -7,10 +7,16 @@ import { ConfirmationDialog } from './components/confirmation-dialog/confirmatio
 import { EditVideoModal } from './components/edit-video-modal/edit-video-modal';
 import { VideoDraft } from './components/video-form/video-form.interface';
 
+enum ModalType {
+  None = 'None',
+  EditVideo = 'EditVideo',
+  AddVideo = 'AddVideo',
+  DeleteVideoConfirmation = 'DeleteVideoConfirmation'
+}
+
 const App: React.FC = () => {
   const [videos, setVideos] = useState<Video[]>([]);
-  const [confirmDialogIsShown, setConfirmDialogIsShown] = useState(false);
-  const [editVideoIsShown, setEditVideoIsShown] = useState(false);
+  const [shownModal, setShownModal] = useState(ModalType.None);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
   const fetchVideos = useCallback(() => {
@@ -22,12 +28,12 @@ const App: React.FC = () => {
   };
 
   const handleClickEdit = (video: Video) => {
-    setEditVideoIsShown(true);
+    setShownModal(ModalType.EditVideo);
     setSelectedVideo(video);
   };
 
   const handleClickDelete = (video: Video) => {
-    setConfirmDialogIsShown(true);
+    setShownModal(ModalType.DeleteVideoConfirmation);
     setSelectedVideo(video);
   };
 
@@ -37,16 +43,16 @@ const App: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-    setConfirmDialogIsShown(false);
+    setShownModal(ModalType.None);
     fetchVideos();
   }, [selectedVideo, fetchVideos]);
 
   const handleRemoveVideoDismiss = useCallback(() => {
-    setConfirmDialogIsShown(false);
+    setShownModal(ModalType.None);
   }, []);
 
   const handleEditVideoDismiss = useCallback(() => {
-    setEditVideoIsShown(false);
+    setShownModal(ModalType.None);
   }, []);
 
   const handleEditVideoSubmit = useCallback(async (video: VideoDraft) => {
@@ -60,7 +66,7 @@ const App: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-    setEditVideoIsShown(false);
+    setShownModal(ModalType.None);
     await fetchVideos();
   }, [fetchVideos, selectedVideo]);
 
@@ -81,14 +87,14 @@ const App: React.FC = () => {
         />
       </Container>
       <ConfirmationDialog
-        isShown={confirmDialogIsShown}
+        isShown={shownModal === ModalType.DeleteVideoConfirmation}
         title={'Video deletion'}
         description={'Do you want to delete the video?'}
         onAccept={handleRemoveVideoAccept}
         onDismiss={handleRemoveVideoDismiss}
       />
       <EditVideoModal
-        isShown={editVideoIsShown}
+        isShown={shownModal === ModalType.EditVideo}
         video={selectedVideo}
         onDismiss={handleEditVideoDismiss}
         onSubmit={handleEditVideoSubmit}

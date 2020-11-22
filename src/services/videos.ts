@@ -21,10 +21,10 @@ export const getVideos = (): Promise<Video[]> => {
         id: video.id,
         name: video.name,
         author: author.name,
-        categories: video.catIds.map((catId) => {
+        categories: video.catIds.reduce<string[]>((acc, catId) => {
           const category =  categories.find((cat) => cat.id === catId);
-          return category ? category.name : '';
-        }).filter(Boolean)
+          return category ? [...acc, category.name] : acc;
+        }, []),
       }));
 
       return [
