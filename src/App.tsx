@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { AppBar, Button, Container, createStyles, Theme, Toolbar, Typography } from '@material-ui/core';
 import { VideosTable } from './components/videos-table/videos-table';
 import * as videosService from './services/videos';
 import { Video, VideoDraft } from './services/video.interface';
 import { ConfirmationDialog } from './components/confirmation-dialog/confirmation-dialog';
 import { EditVideoModal } from './components/edit-video-modal/edit-video-modal';
-import { makeStyles } from '@material-ui/core/styles';
-import lightGreen from '@material-ui/core/colors/lightGreen';
+import { AppContainer } from './components/app-container/app-container';
 
 enum ModalType {
   None = 'None',
@@ -15,22 +13,9 @@ enum ModalType {
   DeleteVideoConfirmation = 'DeleteVideoConfirmation'
 }
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    title: {
-      flexGrow: 1,
-    },
-    addButton: {
-      backgroundColor: lightGreen[700],
-    },
-  }),
-);
-
 const descById = (a: Video, b: Video) => b.id - a.id;
 
 const App: React.FC = () => {
-  const classes = useStyles();
-
   const [videos, setVideos] = useState<Video[]>([]);
   const [shownModal, setShownModal] = useState(ModalType.None);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
@@ -100,29 +85,13 @@ const App: React.FC = () => {
 
   return (
     <>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography
-            variant="h6"
-            className={classes.title}>
-            Video Manager
-          </Typography>
-          <Button
-            onClick={handleClickAdd}
-            color="primary"
-            variant="contained"
-            className={classes.addButton}>
-            Add video
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Container>
+      <AppContainer onClickAddButton={handleClickAdd}>
         <VideosTable
           videos={[...videos].sort(descById)}
           onClickDelete={handleClickDelete}
           onClickEdit={handleClickEdit}
         />
-      </Container>
+      </AppContainer>
       <ConfirmationDialog
         isShown={shownModal === ModalType.DeleteVideoConfirmation}
         title={'Video deletion'}
