@@ -26,6 +26,8 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const descById = (a: Video, b: Video) => b.id - a.id;
+
 const App: React.FC = () => {
   const classes = useStyles();
 
@@ -116,7 +118,7 @@ const App: React.FC = () => {
       </AppBar>
       <Container>
         <VideosTable
-          videos={videos}
+          videos={[...videos].sort(descById)}
           onClickDelete={handleClickDelete}
           onClickEdit={handleClickEdit}
         />
