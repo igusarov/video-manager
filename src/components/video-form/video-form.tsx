@@ -35,7 +35,9 @@ const Component: React.FC<VideoFormProps> = ({ video, onChange }) => {
   const classes = useStyles();
 
   useEffect(function syncStateWithVideo() {
-    if (!video) {
+    if (!video ||
+      !availableCategories.length ||
+      !availableAuthors.length) {
       return;
     }
     setName(video.name);
@@ -44,9 +46,9 @@ const Component: React.FC<VideoFormProps> = ({ video, onChange }) => {
       ...acc,
       [category]: true,
     }), {}));
-  }, [video]);
+  }, [video, availableAuthors, availableCategories]);
 
-  useEffect(function fetchData() {
+  useEffect(function fetchDataAndAsyncData() {
     Promise.all([getCategories(), getAuthors()]).then(([categories, authors]) => {
       setAvailableCategories(categories);
       setAvailableAuthors(authors);
@@ -81,10 +83,10 @@ const Component: React.FC<VideoFormProps> = ({ video, onChange }) => {
   return (
     <form noValidate autoComplete="off">
       <FormControl className={classes.formControl}>
-        <InputLabel>Name</InputLabel>
+        <InputLabel required>Name</InputLabel>
         <Input
           fullWidth
-          value={name}
+          value={name || ''}
           onChange={handleNameChange}
         />
       </FormControl>

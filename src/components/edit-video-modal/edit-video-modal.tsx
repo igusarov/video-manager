@@ -23,6 +23,10 @@ const Component: React.FC<EditVideoModalProps> = ({ isShown, onDismiss, video, o
     }
   };
 
+  const submitButtonDisabled = (): boolean => {
+    return !(videoDraft && videoDraft.name.trim() && videoDraft.author.trim())
+  };
+
   return (
     <Dialog open={isShown} onClose={onDismiss} aria-labelledby="form-dialog-title">
       <DialogTitle>{video ? 'Save' : 'Add'} video</DialogTitle>
@@ -33,7 +37,10 @@ const Component: React.FC<EditVideoModalProps> = ({ isShown, onDismiss, video, o
         <Button onClick={onDismiss} color="primary">
           Cancel
         </Button>
-        <Button onClick={handleSubmit} color="primary">
+        <Button
+          disabled={submitButtonDisabled()}
+          onClick={handleSubmit}
+          color="primary">
           {video ? 'Save' : 'Add'}
         </Button>
       </DialogActions>
