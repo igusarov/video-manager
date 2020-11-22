@@ -1,8 +1,6 @@
-import { Video } from '../../services/video.interface';
-
-export type VideoDraft = Omit<Video, 'id'>;
+import { Video, VideoDraft } from '../../services/video.interface';
 
 export interface VideoFormProps {
-  onChange: (video: Omit<Video, 'id'>) => void;
+  onChange: (video: VideoDraft) => void;
   video?: Video | null;
 }

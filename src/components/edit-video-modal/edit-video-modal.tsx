@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@material-ui/core';
 import { VideoForm } from '../video-form/video-form';
-import { VideoDraft } from '../video-form/video-form.interface';
+import { VideoDraft } from '../../services/video.interface';
 
 const Component: React.FC<EditVideoModalProps> = ({ isShown, onDismiss, video, onSubmit }) => {
   const [videoDraft, setVideoDraft] = useState<VideoDraft | null>(null);
@@ -25,7 +25,7 @@ const Component: React.FC<EditVideoModalProps> = ({ isShown, onDismiss, video, o
 
   return (
     <Dialog open={isShown} onClose={onDismiss} aria-labelledby="form-dialog-title">
-      <DialogTitle>Save video</DialogTitle>
+      <DialogTitle>{video ? 'Save' : 'Add'} video</DialogTitle>
       <DialogContent>
         <VideoForm video={video} onChange={handleChange}/>
       </DialogContent>
@@ -34,7 +34,7 @@ const Component: React.FC<EditVideoModalProps> = ({ isShown, onDismiss, video, o
           Cancel
         </Button>
         <Button onClick={handleSubmit} color="primary">
-          Save
+          {video ? 'Save' : 'Add'}
         </Button>
       </DialogActions>
     </Dialog>

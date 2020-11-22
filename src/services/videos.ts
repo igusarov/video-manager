@@ -1,4 +1,4 @@
-import { Video } from './video.interface';
+import { Video, VideoDraft } from './video.interface';
 import { getCategories } from './categories';
 import { getAuthors, patchAuthorById } from './authors';
 import { AuthorVideo } from './author.interface';
@@ -67,4 +67,22 @@ export const saveVideoById = async (id: number, video: Video): Promise<void> => 
     const updatedVideos = author.videos.map((item) => item.id === id ? convertedVideo : item);
     await patchAuthorById(author.id, {videos: updatedVideos});
   }
+};
+
+export const addVideo = async (video: VideoDraft): Promise<void> => {
+  const [categories, authors] = await Promise.all([getCategories(), getAuthors()]);
+  const author = authors.find((item) => item.name === video.author);
+  if (!author) {
+    throw new Error('Author not found');
+  }
+  const maxVideoId = authors.reduce<number>((maxId, author) => {
+    const authorVideoMaxId =  Math.max(...author.videos.map((item) => item.id));
+    return Math.max(maxId, authorVideoMaxId);
+  }, 0);
+  const convertedVideo = convertToAuthorVideo({
+    ...video,
+    id: maxVideoId + 1 // the id needs to be generated o front-end since api doesnt support this
+  }, categories);
+  const updatedVideos = [...author.videos, convertedVideo];
+  await patchAuthorById(author.id, {videos: updatedVideos});
 };

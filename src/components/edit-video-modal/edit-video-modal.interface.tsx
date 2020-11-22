@@ -1,5 +1,4 @@
-import { Video } from '../../services/video.interface';
-import { VideoDraft } from '../video-form/video-form.interface';
+import { Video, VideoDraft } from '../../services/video.interface';
 
 export interface EditVideoModalProps {
   video?: Video | null;

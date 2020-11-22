@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { AppBar, Container, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Button, Container, createStyles, Theme, Toolbar, Typography } from '@material-ui/core';
 import { VideosTable } from './components/videos-table/videos-table';
 import * as videosService from './services/videos';
-import { Video } from './services/video.interface';
+import { Video, VideoDraft } from './services/video.interface';
 import { ConfirmationDialog } from './components/confirmation-dialog/confirmation-dialog';
 import { EditVideoModal } from './components/edit-video-modal/edit-video-modal';
-import { VideoDraft } from './components/video-form/video-form.interface';
+import { makeStyles } from '@material-ui/core/styles';
+import lightGreen from '@material-ui/core/colors/lightGreen';
 
 enum ModalType {
   None = 'None',
@@ -14,7 +15,20 @@ enum ModalType {
   DeleteVideoConfirmation = 'DeleteVideoConfirmation'
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    title: {
+      flexGrow: 1,
+    },
+    addButton: {
+      backgroundColor: lightGreen[700],
+    },
+  }),
+);
+
 const App: React.FC = () => {
+  const classes = useStyles();
+
   const [videos, setVideos] = useState<Video[]>([]);
   const [shownModal, setShownModal] = useState(ModalType.None);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
@@ -37,6 +51,10 @@ const App: React.FC = () => {
     setSelectedVideo(video);
   };
 
+  const handleClickAdd = () => {
+    setShownModal(ModalType.AddVideo);
+  };
+
   const handleRemoveVideoAccept = useCallback(async () => {
     try {
       selectedVideo && await videosService.removeVideoById(selectedVideo.id);
@@ -47,11 +65,7 @@ const App: React.FC = () => {
     fetchVideos();
   }, [selectedVideo, fetchVideos]);
 
-  const handleRemoveVideoDismiss = useCallback(() => {
-    setShownModal(ModalType.None);
-  }, []);
-
-  const handleEditVideoDismiss = useCallback(() => {
+  const handleModalDismiss = useCallback(() => {
     setShownModal(ModalType.None);
   }, []);
 
@@ -70,13 +84,34 @@ const App: React.FC = () => {
     await fetchVideos();
   }, [fetchVideos, selectedVideo]);
 
+  const handleAddVideoSubmit = useCallback(async (video: VideoDraft) => {
+    try {
+      await videosService.addVideo(video);
+    } catch (e) {
+      console.error(e);
+    }
+    setShownModal(ModalType.None);
+    await fetchVideos();
+  }, [fetchVideos]);
+
   useEffect(() => fetchVideos(), [fetchVideos]);
 
   return (
     <>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6">Video Manager</Typography>
+          <Typography
+            variant="h6"
+            className={classes.title}>
+            Video Manager
+          </Typography>
+          <Button
+            onClick={handleClickAdd}
+            color="primary"
+            variant="contained"
+            className={classes.addButton}>
+            Add video
+          </Button>
         </Toolbar>
       </AppBar>
       <Container>
@@ -91,13 +126,18 @@ const App: React.FC = () => {
         title={'Video deletion'}
         description={'Do you want to delete the video?'}
         onAccept={handleRemoveVideoAccept}
-        onDismiss={handleRemoveVideoDismiss}
+        onDismiss={handleModalDismiss}
       />
       <EditVideoModal
         isShown={shownModal === ModalType.EditVideo}
         video={selectedVideo}
-        onDismiss={handleEditVideoDismiss}
+        onDismiss={handleModalDismiss}
         onSubmit={handleEditVideoSubmit}
+      />
+      <EditVideoModal
+        isShown={shownModal === ModalType.AddVideo}
+        onDismiss={handleModalDismiss}
+        onSubmit={handleAddVideoSubmit}
       />
     </>
   );
